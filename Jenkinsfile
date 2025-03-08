@@ -1,36 +1,36 @@
 pipeline {
     agent any
-    
+
     environment {
-        DOCKER_HUB_CREDS = credentials('docker-hub-credentials')
-        DOCKER_USERNAME = 'your-dockerhub-username'  // Replace with your Docker Hub username
+        DOCKER_HUB_CREDS = credentials('docker-hub-credentials')  // Corrected secret reference
+        DOCKER_USERNAME = 'ruchitadarur'  
         IMAGE_NAME = 'survey-app'
         IMAGE_TAG = "${BUILD_NUMBER}"
         KUBECONFIG = credentials('kubeconfig')
     }
-    
+
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-        
+
         stage('Build Docker Image') {
             steps {
                 sh "docker build -t ${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} ."
                 sh "docker tag ${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_USERNAME}/${IMAGE_NAME}:latest"
             }
         }
-        
+
         stage('Push to Docker Hub') {
             steps {
-                sh "echo ${DOCKER_HUB_CREDS_PSW} | docker login -u ${DOCKER_HUB_CREDS_USR} --password-stdin"
+                sh "echo ${DOCKER_HUB_CREDS} | docker login -u ${DOCKER_USERNAME} --password-stdin"
                 sh "docker push ${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}"
                 sh "docker push ${DOCKER_USERNAME}/${IMAGE_NAME}:latest"
             }
         }
-        
+
         stage('Deploy to Kubernetes') {
             steps {
                 sh "sed -i 's|\${DOCKER_USERNAME}|${DOCKER_USERNAME}|g' kubernetes/deployment.yaml"
@@ -40,7 +40,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         always {
             sh "docker logout"
