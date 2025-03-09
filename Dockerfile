@@ -1,20 +1,14 @@
-# Use the official Tomcat 9 image with JDK 11
-FROM tomcat:9.0-jdk11
+# Use the official Nginx image
+FROM nginx:latest
 
-# Set working directory inside the container
-WORKDIR /usr/local/tomcat
+# Remove default Nginx HTML files
+RUN rm -rf /usr/share/nginx/html/*
 
-# Remove default Tomcat applications (clean setup)
-RUN rm -rf webapps/*
+# Copy your HTML files into Nginx's serving directory
+COPY src/main/webapp/ /usr/share/nginx/html/
 
-# Copy your application WAR file into Tomcat
-COPY target/*.war webapps/ROOT.war
+# Expose port 80 for HTTP traffic
+EXPOSE 80
 
-# Expose the Tomcat server port
-EXPOSE 8080
-
-# Run Tomcat when the container starts
-CMD ["catalina.sh", "run"]
-
-
-
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
