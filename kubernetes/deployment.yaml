@@ -15,15 +15,15 @@ spec:
         app: survey-app
     spec:
       containers:
-      - name: survey-app
-        image: ${DOCKER_USERNAME}/survey-app:latest  # Ensure this image is built and pushed
-        ports:
-        - containerPort: 80  # Change from 8080 to 80
-        imagePullPolicy: Always
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
+        - name: survey-app
+          image: ${DOCKER_USERNAME}/survey-app:latest
+          ports:
+            - containerPort: 80
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
