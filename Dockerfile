@@ -1,13 +1,13 @@
-# Use the official Nginx image
+# Use Nginx as the base image
 FROM nginx:latest
 
-# Remove default Nginx HTML files
+# Remove default nginx website files
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy survey.html and rename it as index.html
-COPY src/main/webapp/survey.html /usr/share/nginx/html/index.html
+# Copy your HTML files to Nginx
+COPY src/main/webapp/ /usr/share/nginx/html/
 
-# Expose port 80 for HTTP traffic
+# Expose port 80 to access the site
 EXPOSE 80
 
 # Start Nginx
