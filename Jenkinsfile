@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_CREDENTIALS = credentials('docker-hub-credentials')  // Fetch username + password
+        DOCKER_CREDENTIALS = credentials('docker-hub-credentials')  // Fetch Docker Hub credentials
         IMAGE_NAME = 'survey-app'
         IMAGE_TAG = "${BUILD_NUMBER}"
         KUBECONFIG = credentials('kubeconfig')
@@ -17,8 +17,10 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${DOCKER_CREDENTIALS_USR}/${IMAGE_NAME}:${IMAGE_TAG} ."
-                sh "docker tag ${DOCKER_CREDENTIALS_USR}/${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_CREDENTIALS_USR}/${IMAGE_NAME}:latest"
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh "docker build -t ${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} ."
+                    sh "docker tag ${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_USERNAME}/${IMAGE_NAME}:latest"
+                }
             }
         }
 
@@ -34,10 +36,12 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh "sed -i 's|\${DOCKER_USERNAME}|${DOCKER_USERNAME}|g' kubernetes/deployment.yaml"
-                sh "kubectl apply -f kubernetes/deployment.yaml"
-                sh "kubectl apply -f kubernetes/service.yaml"
-                sh "kubectl set image deployment/survey-app survey-app=${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}"
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh "sed -i 's|\${DOCKER_USERNAME}|${DOCKER_USERNAME}|g' kubernetes/deployment.yaml"
+                    sh "kubectl apply -f kubernetes/deployment.yaml"
+                    sh "kubectl apply -f kubernetes/service.yaml"
+                    sh "kubectl set image deployment/survey-app survey-app=${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}"
+                }
             }
         }
     }
