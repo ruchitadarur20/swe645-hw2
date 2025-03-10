@@ -3,10 +3,11 @@ kind: Service
 metadata:
   name: survey-app-service
 spec:
+  type: LoadBalancer
+  loadBalancerIP: 35.202.41.70  # Specify the static IP here
   selector:
     app: survey-app
   ports:
     - protocol: TCP
       port: 80
       targetPort: 80
-  type: LoadBalancer
