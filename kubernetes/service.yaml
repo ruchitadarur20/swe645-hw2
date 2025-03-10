@@ -9,7 +9,7 @@ spec:
     app: survey-app
   type: LoadBalancer
   externalTrafficPolicy: Local
-  loadBalancerIP: 35.202.41.70
+  loadBalancerIP: 35.202.41.70  # Force Kubernetes to use this IP
   ports:
     - protocol: TCP
       port: 80
