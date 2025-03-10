@@ -9,7 +9,7 @@ spec:
     app: survey-app
   type: LoadBalancer
   externalTrafficPolicy: Local
-  loadBalancerIP: 35.202.41.70  # Make sure this IP is reserved!
+  loadBalancerIP: 35.202.41.70
   ports:
     - protocol: TCP
       port: 80
